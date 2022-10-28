@@ -66,7 +66,7 @@ CUDNN:
 DATASET:
   DATASET: 'data'
   DATA_FORMAT: 'jpg'
-  ROOT: 'garbage'
+  ROOT: 'images'
   TEST_SET: 'val'
   TRAIN_SET: 'train'
 TEST:
