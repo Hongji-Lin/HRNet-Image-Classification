@@ -33,7 +33,7 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
 
     end = time.time()
     for i, (input, target) in enumerate(train_loader):
-        # measure data loading time
+        # measure imagenet loading time
         data_time.update(time.time() - end)
         #target = target - 1 # Specific for imagenet
 

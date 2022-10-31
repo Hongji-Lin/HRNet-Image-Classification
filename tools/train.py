@@ -54,7 +54,7 @@ def parse_args():
                         type=str,
                         default='')
     parser.add_argument('--dataDir',
-                        help='data directory',
+                        help='imagenet directory',
                         type=str,
                         default='')
     parser.add_argument('--testModel',
@@ -153,6 +153,19 @@ def main():
             normalize,
         ])
     )
+
+    # print(train_dataset.classes)  #根据分的文件夹的名字来确定的类别
+    with open("class.txt", "w") as f1:
+        for classname in train_dataset.classes:
+            f1.write(classname + '\n')
+
+    # print(train_dataset.class_to_idx) #按顺序为这些类别定义索引为0,1...
+    with open("classToIndex.txt", "w") as f2:
+        for key, value in train_dataset.class_to_idx.items():
+            f2.write(str(key) + " " + str(value) + '\n')
+
+    # print(train_dataset.imgs) #返回从所有文件夹中得到的图片的路径以及其类别
+
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=config.TRAIN.BATCH_SIZE_PER_GPU*len(gpus),
@@ -203,6 +216,11 @@ def main():
     logger.info('saving final model state to {}'.format(
         final_model_state_file))
     torch.save(model.module.state_dict(), final_model_state_file)
+
+    final_pth_file = os.path.join(final_output_dir, 'HRNet.pyh')
+    print("final_pth_file:", final_pth_file)
+    torch.save(model.module, final_pth_file)
+
     writer_dict['writer'].close()
 
 

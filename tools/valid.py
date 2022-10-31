@@ -50,7 +50,7 @@ def parse_args():
                         type=str,
                         default='')
     parser.add_argument('--dataDir',
-                        help='data directory',
+                        help='imagenet directory',
                         type=str,
                         default='')
     parser.add_argument('--testModel',
