@@ -11,7 +11,7 @@ from __future__ import print_function
 import torch
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target, topk=(1,2)):
     """Computes the precision@k for the specified values of k"""
     with torch.no_grad():
         maxk = max(topk)
