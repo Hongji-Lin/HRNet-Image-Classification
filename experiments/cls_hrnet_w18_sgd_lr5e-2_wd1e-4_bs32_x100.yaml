@@ -64,9 +64,9 @@ CUDNN:
   DETERMINISTIC: false
   ENABLED: true
 DATASET:
-  DATASET: 'images'
+  DATASET: 'imagenet'
   DATA_FORMAT: 'jpg'
-  ROOT: 'imagenet/images'
+  ROOT: 'images'
   TEST_SET: 'val'
   TRAIN_SET: 'train'
 TEST:
