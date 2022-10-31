@@ -103,7 +103,7 @@ def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
 
             # measure accuracy and record loss
             losses.update(loss.item(), input.size(0))
-            prec1, prec5 = accuracy(output, target, (1, 5))
+            prec1, prec5 = accuracy(output, target, (1, 2))
             top1.update(prec1[0], input.size(0))
             top5.update(prec5[0], input.size(0))
 
