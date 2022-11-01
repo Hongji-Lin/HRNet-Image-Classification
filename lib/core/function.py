@@ -128,6 +128,8 @@ def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
             writer.add_scalar('valid_top1', top1.avg, global_steps)
             writer_dict['valid_global_steps'] = global_steps + 1
 
+        print('class:{}'.format(output.argmax(1)))
+
     return top1.avg
 
 
