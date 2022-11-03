@@ -22,7 +22,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     else:
         for name in reemp_list:
             shutil.move(empty_valDir + name, empty_fileDir)
-    return
+    # return # 本地调试时要return(清理照片，val保持空的上传），放到服务器上不需要
 
     full_list = os.listdir(full_fileDir)  # 取full图片的原始路径
     print(full_list)
@@ -44,7 +44,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
         shutil.move(full_fileDir + full_name, full_valDir)
     for empty_name in empty_sample:
         shutil.move(empty_fileDir + empty_name, empty_valDir)
-    # return
+    return
 
 
 # def move_label(file_list, file_label_train, file_label_val):
@@ -63,20 +63,17 @@ if __name__ == '__main__':
     empty_fileDir = '/root/projects/HRNet-Image-Classification/imagenet/images/train/empty/'  # empty源图片文件夹路径
     full_valDir = '/root/projects/HRNet-Image-Classification/imagenet/images/val/full/'  # full图片移动到新的文件夹路径
     empty_valDir = '/root/projects/HRNet-Image-Classification/imagenet/images/val/empty/'  # empty图片移动到新的文件夹路径
-    
-    '''
-    # pycharm控制台相对路径
-    full_fileDir = './imagenet/images/train/full/'  # full源图片文件夹路径
-    empty_fileDir = './imagenet/images/train/empty/'  # empty源图片文件夹路径
-    full_valDir = './imagenet/images/val/full/'  # full图片移动到新的文件夹路径
-    empty_valDir = './imagenet/images/val/empty/'  # empty图片移动到新的文件夹路径
-    '''
-    '''
-    # pycharm直接运行的相对路径
-    full_fileDir = '../images/train/full/'  # full源图片文件夹路径
-    empty_fileDir = '../images/train/empty/'  # empty源图片文件夹路径
-    full_valDir = '../images/val/full/'  # full图片移动到新的文件夹路径
-    empty_valDir = '../images/val/empty/'  # empty图片移动到新的文件夹路径
-    '''
+
+    # # pycharm控制台相对路径
+    # full_fileDir = './imagenet/images/train/full/'  # full源图片文件夹路径
+    # empty_fileDir = './imagenet/images/train/empty/'  # empty源图片文件夹路径
+    # full_valDir = './imagenet/images/val/full/'  # full图片移动到新的文件夹路径
+    # empty_valDir = './imagenet/images/val/empty/'  # empty图片移动到新的文件夹路径
+
+    # # pycharm直接运行的相对路径
+    # full_fileDir = '../images/train/full/'  # full源图片文件夹路径
+    # empty_fileDir = '../images/train/empty/'  # empty源图片文件夹路径
+    # full_valDir = '../images/val/full/'  # full图片移动到新的文件夹路径
+    # empty_valDir = '../images/val/empty/'  # empty图片移动到新的文件夹路径
 
     move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir)
