@@ -2,7 +2,7 @@
 # @author: Evan
 # @file: data_partition.py
 # @time: 2022/11/2 9:28
-# @desc: 数据集的生成和读取
+# @desc: 数据集的划分
 
 import os, random, shutil
 
