@@ -44,7 +44,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
         shutil.move(full_fileDir + full_name, full_valDir)
     for empty_name in empty_sample:
         shutil.move(empty_fileDir + empty_name, empty_valDir)
-    return
+    # return
 
 
 # def move_label(file_list, file_label_train, file_label_val):
@@ -58,10 +58,19 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
 
 
 if __name__ == '__main__':
+    '''
+    # win上的相对路径
     full_fileDir = '../images/train/full/'  # full源图片文件夹路径
     empty_fileDir = '../images/train/empty/'  # empty源图片文件夹路径
     full_valDir = '../images/val/full/'  # full图片移动到新的文件夹路径
     empty_valDir = '../images/val/empty/'  # empty图片移动到新的文件夹路径
+    '''
+    # Linux上的绝对路径
+    full_fileDir = r'/root/projects/HRNet-Image-Classification/images/train/full/'  # full源图片文件夹路径
+    empty_fileDir = r'/root/projects/HRNet-Image-Classification/images/train/full'  # empty源图片文件夹路径
+    full_valDir = r'/root/projects/HRNet-Image-Classification/images/val/full/'  # full图片移动到新的文件夹路径
+    empty_valDir = r'/root/projects/HRNet-Image-Classification/images/val/full'  # empty图片移动到新的文件夹路径
+
     move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir)
     # file_list = os.listdir(tarDir)
     # file_label_train = r"E:\NEt\yolov5-hat\VOCdevkit\labels\train"  # 源图片标签路径
