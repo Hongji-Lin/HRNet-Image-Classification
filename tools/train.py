@@ -217,7 +217,8 @@ def main():
         final_model_state_file))
     torch.save(model.module.state_dict(), final_model_state_file)
 
-    final_pth_file = os.path.join(final_output_dir, 'HRNet.pyh')
+    # 增加保存pth模型的代码
+    final_pth_file = os.path.join(final_output_dir, 'HRNet.pth')
     print("final_pth_file:", final_pth_file)
     torch.save(model.module, final_pth_file)
 

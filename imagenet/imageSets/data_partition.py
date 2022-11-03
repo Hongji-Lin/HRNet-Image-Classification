@@ -6,15 +6,20 @@
 
 import os, random, shutil
 
-def moveimg(fileDir, tarDir):
-    pathDir = os.listdir(fileDir)  # 取图片的原始路径
-    filenumber = len(pathDir)
+def moveimg(full_fileDir, empty_fileDir, valDir):
+    full_pathDir = os.listdir(full_fileDir)  # 取full图片的原始路径
+    full_filenumber = len(full_pathDir)
+    empty_pathDir = os.listdir(empty_fileDir)  # 取empty图片的原始路径
+    empty_filenumber = len(empty_pathDir)
+
     rate = 0.1  # 自定义抽取图片的比例，比方说100张抽10张，那就是0.1
-    picknumber = int(filenumber * rate)  # 按照rate比例从文件夹中取一定数量图片
-    sample = random.sample(pathDir, picknumber)  # 随机选取picknumber数量的样本图片
-    print(sample)
-    for name in sample:
-        shutil.move(fileDir + name, tarDir + "\\" + name)
+    full_picknumber = int(full_filenumber * rate)  # 按照rate比例从full文件夹中取一定数量图片
+    empty_picknumber = int(empty_filenumber * rate) # 按照rate比例从emoty文件夹中取一定数量图片
+    full_sample = random.sample(full_pathDir, full_picknumber)  # 随机选取full数量的样本图片
+    empty_sample = random.sample(empty_pathDir, empty_picknumber)  # 随机选取empty数量的样本图片
+
+    for name in full_sample:
+        shutil.move(full_fileDir + name, tarDir + "\\" + name)
     return
 
 
