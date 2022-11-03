@@ -22,7 +22,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     else:
         for name in reemp_list:
             shutil.move(empty_valDir + name, empty_fileDir)
-    # return
+    return
 
     full_list = os.listdir(full_fileDir)  # 取full图片的原始路径
     print(full_list)
