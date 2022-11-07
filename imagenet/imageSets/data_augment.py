@@ -14,9 +14,6 @@ from utils.general import resample_segments, segment2box
 # 调用函数的文件位置：文件位置：utils/datasets.py
 # 色域空间增强Augment colorspace：H色调、S饱和度、V亮度
 # 通过一些随机值改变hsv，实现数据增强
-
-
-# 被调用的函数位置：utils/augmentations.py
 def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
     # HSV color-space augmentation
     if hgain or sgain or vgain:
@@ -36,12 +33,8 @@ def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
 
 # 随机旋转、平移、缩放、裁剪，错切/非垂直投影 、透视变换（从0开始）
 # 调用函数地址：utils/datasets.py
-# Augment
 # random_perspective Augment  随机透视变换 [1280, 1280, 3] => [640, 640, 3]
 # 对mosaic整合后的图片进行随机旋转、平移、缩放、裁剪，透视变换，并resize为输入大小img_size
-
-
-
 # 被调用的函数地址：utils/augmentations.py
 def random_perspective(im, targets=(), segments=(),
                        degrees=10,  # 旋转角度
@@ -148,15 +141,6 @@ def mixup(im, labels, im2, labels2):
     im = (im * r + im2 * (1 - r)).astype(np.uint8)
     labels = np.concatenate((labels, labels2), 0)
     return im, labels
-
-
-
-
-
-
-
-
-
 
 
 def box_candidates(box1, box2, wh_thr=2, ar_thr=100, area_thr=0.1, eps=1e-16):  # box1(4,n), box2(4,n)
