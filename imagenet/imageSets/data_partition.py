@@ -7,6 +7,7 @@
 import os, random, shutil
 
 
+
 def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     reful_list = os.listdir(full_valDir)
     reemp_list = os.listdir(empty_valDir)
