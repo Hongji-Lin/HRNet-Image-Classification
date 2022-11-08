@@ -40,12 +40,12 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     print("train集中empty的数量为：{}".format(empty_total - empty_nums))
     print("val集中full的数量为：{}".format(full_nums))
     print("val集中empty的数量为：{}".format(empty_nums))
-    print("训练集，验证集划分完成！")
 
     for full_name in full_sample:
         shutil.move(full_fileDir + full_name, full_valDir)
     for empty_name in empty_sample:
         shutil.move(empty_fileDir + empty_name, empty_valDir)
+    print("训练集，验证集划分完成！")
     # return
 
 
