@@ -3,3 +3,7 @@
 *.jpg
 .idea/HRNet-Image-Classification.iml
 .idea/misc.xml
+imagenet/images/val/empty/
+imagenet/images/val/full/
+.idea/misc.xml
+.idea/HRNet-Image-Classification.iml
