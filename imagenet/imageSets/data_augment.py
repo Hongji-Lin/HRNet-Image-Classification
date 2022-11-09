@@ -88,41 +88,41 @@ def gaussian_blur(image):
 
 # 空间几何变换
 # 计算所有照片的高宽均值
-def cal_mean():
-    full_fileDir = "imagenet/imageSets/original/full"
-    empty_fileDir = "imagenet/imageSets/original/empty"
-    full_list = os.listdir(full_fileDir)
-    empty_list = os.listdir(empty_fileDir)
-    img_height = []
-    img_width = []
-
-    for full_img in full_list:
-        full_img = cv2.imread((full_fileDir + full_img))
-        h = full_img.shape[0]
-        w = full_img.shape[1]
-
-        img_height.append(h)
-        img_width.append(w)
-
-        for emp_img in empty_list:
-            emp_img = cv2.imread((empty_fileDir + emp_img))
-            h = emp_img.shape[0]
-            w = emp_img.shape[1]
-
-        img_height.append(h)
-        img_width.append(w)
-
-    h_mean = int(np.mean(img_height))
-    w_mean = int(np.mean(img_width))
-    print(h_mean)
-    print(w_mean)
-    return h_mean, w_mean
+# def cal_mean():
+#     full_fileDir = "./original/full/"
+#     empty_fileDir = "./original/empty/"
+#     full_list = os.listdir(full_fileDir)
+#     empty_list = os.listdir(empty_fileDir)
+#     img_height = []
+#     img_width = []
+#
+#     for full_img in full_list:
+#         full_img = cv2.imread((full_fileDir + full_img))
+#         h = full_img.shape[0]
+#         w = full_img.shape[1]
+#
+#         img_height.append(h)
+#         img_width.append(w)
+#
+#     for emp_img in empty_list:
+#         emp_img = cv2.imread((empty_fileDir + emp_img))
+#         h = emp_img.shape[0]
+#         w = emp_img.shape[1]
+#
+#         img_height.append(h)
+#         img_width.append(w)
+#
+#     h_mean = int(np.mean(img_height))
+#     w_mean = int(np.mean(img_width))
+#     print(h_mean)
+#     print(w_mean)
+#     return h_mean, w_mean
 
 
 # 放大缩小
 def Scale(image):
-    h, w = cal_mean()
-    return cv2.resize(image, (w, h), interpolation=cv2.INTER_LINEAR)
+    # h, w = cal_mean()
+    return cv2.resize(image, (460, 708), interpolation=cv2.INTER_LINEAR)
 
 
 # 水平翻转
@@ -167,37 +167,46 @@ def data_aug(img_path, save_path):
     img_list = os.listdir(img_path)
     for file_name in img_list:
         file_i_path = os.path.join(img_path, file_name)
-        print(file_i_path)
         img_i = cv2.imread(file_i_path)
 
-        print("数据增强开始")
+        print("{}数据增强开始".format(file_name))
+        print("img_hsv", end=', ')
         img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
 
+        print("img_dark", end=', ')
         img_dark = Darker(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
 
+        print("img_bright", end=', ')
         img_bright = Brighter(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
 
+        print("img_noise", end=', ')
         img_noise = gaussian_noise(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_noise.jpg"),  img_noise)
 
+        print("img_blur", end=', ')
         img_blur = gaussian_blur(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
 
+        print("img_scale", end=', ')
         img_scale = Scale(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
 
+        print("img_horizon", end=', ')
         img_horizon = Horizontal(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_horizon.jpg"), img_horizon)
 
+        print("img_rotate", end=', ')
         img_rotate = Rotate(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
 
+        print("img_move", end=', ')
         img_move = Move(img_i, x=120, y=120)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
 
+        print("img_cutout")
         img_cutout = augment_cutout(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
 
@@ -205,6 +214,13 @@ def data_aug(img_path, save_path):
 
 
 if __name__ == "__main__":
-    img_path = "./test/"
-    save_path = "./aug_img/"
-    data_aug(img_path, save_path)
+    # calmean = cal_mean()
+    # print(calmean)
+
+    ful_path = "./original/full/"
+    full_save = "../images/train/full/"
+    data_aug(ful_path, full_save)
+
+    emp_path = "./original/empty/"
+    emp_save = "../images/train/empty/"
+    data_aug(emp_path, emp_save)
