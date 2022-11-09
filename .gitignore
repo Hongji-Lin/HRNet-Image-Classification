@@ -88,7 +88,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -209,6 +208,6 @@ dmypy.json
 .pytype/
 
 # Cython debug symbols
-cython_debug/
+cython_debug/!
 
-!/imagenet/images/
+/imagenet/images/
