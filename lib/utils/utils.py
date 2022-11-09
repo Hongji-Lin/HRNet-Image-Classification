@@ -17,7 +17,7 @@ from pathlib import Path
 import torch
 import torch.optim as optim
 
-def create_logger(cfg, cfg_name, phase='train'):
+def create_logger(cfg, cfg_name, phase='full'):
     root_output_dir = Path(cfg.OUTPUT_DIR)
     # set up logger
     if not root_output_dir.exists():

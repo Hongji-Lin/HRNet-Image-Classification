@@ -28,7 +28,7 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
     top5 = AverageMeter()
 
 
-    # switch to train mode
+    # switch to full mode
     model.train()
 
     end = time.time()

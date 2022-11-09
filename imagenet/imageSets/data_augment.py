@@ -3,18 +3,16 @@
 # @file: data_augment.py
 # @time: 2022/11/7 14:06
 # @desc: 数据增强
-import math
-from random import random
 
 import cv2
 import numpy as np
-from utils.general import resample_segments, segment2box
+from torchvision.transforms import transforms
+import os
 
-# 颜色变化 = HSV + 噪声
+
+# 颜色噪声变化 = HSV + 噪声 + 模糊
 # HSV变换
-# 调用函数的文件位置：文件位置：utils/datasets.py
 # 色域空间增强Augment colorspace：H色调、S饱和度、V亮度
-# 通过一些随机值改变hsv，实现数据增强
 def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
     # HSV color-space augmentation
     if hgain or sgain or vgain:
@@ -29,161 +27,180 @@ def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
 
         im_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
         cv2.cvtColor(im_hsv, cv2.COLOR_HSV2BGR, dst=im)  # no return needed
-
     return im_hsv
 
 
-def Gaussian_noise(image):
-    h,w,c = image.shape
+# 变暗
+def Darker(image,percetage=0.5):
+    w = image.shape[1]
+    h = image.shape[0]
+    # get darker
+    for xi in range(0,w):
+        for xj in range(0,h):
+            image[xj,xi,0] = int(image[xj,xi,0]*percetage)
+            image[xj,xi,1] = int(image[xj,xi,1]*percetage)
+            image[xj,xi,2] = int(image[xj,xi,2]*percetage)
+    return image
+
+
+# 明亮
+def Brighter(image, percetage=1.5):
+    w = image.shape[1]
+    h = image.shape[0]
+    # get brighter
+    for xi in range(0,w):
+        for xj in range(0,h):
+            image[xj,xi,0] = np.clip(int(image[xj,xi,0]*percetage),a_max=255,a_min=0)
+            image[xj,xi,1] = np.clip(int(image[xj,xi,1]*percetage),a_max=255,a_min=0)
+            image[xj,xi,2] = np.clip(int(image[xj,xi,2]*percetage),a_max=255,a_min=0)
+    return image
+
+
+# 高斯噪声
+def gaussian_noise(image):
+    h, w, c = image.shape
     for row in range(h):
         for col in range(w):
-            s = np.random.normal(0,20,3)
+            # 获取三个高斯随机数
+            # 第一个参数：概率分布的均值，对应着整个分布的中心
+            # 第二个参数：概率分布的标准差，对应于分布的宽度
+            # 第三个参数：生成高斯随机数数量
+            s = np.random.normal(0,50,3)
+            # 获取每个像素点的bgr值
             b = image[row,col,0]
             g = image[row,col,1]
             r = image[row,col,2]
+            # 给每个像素值设置新的bgr值
             image[row,col,0] = np.clip(b+s[0],0,255)
             image[row,col,1] = np.clip(g+s[1],0,255)
             image[row,col,2] = np.clip(r+s[2],0,255)
     return image
 
 
-
-# 随机旋转、平移、缩放、裁剪，错切/非垂直投影 、透视变换（从0开始）
-# 调用函数地址：utils/datasets.py
-# random_perspective Augment  随机透视变换 [1280, 1280, 3] => [640, 640, 3]
-# 对mosaic整合后的图片进行随机旋转、平移、缩放、裁剪，透视变换，并resize为输入大小img_size
-# 被调用的函数地址：utils/augmentations.py
-def random_perspective(im, targets=(), segments=(),
-                       degrees=10,  # 旋转角度
-                       translate=.1,  # 平移
-                       scale=.1,  # 缩放
-                       shear=10,  # 错切/非垂直投影
-                       perspective=0.0, # 透视变换
-                       border=(0, 0)):
-    # torchvision.transforms.RandomAffine(degrees=(-10, 10), translate=(0.1, 0.1), scale=(0.9, 1.1), shear=(-10, 10))
-    # targets = [cls, xyxy]
-
-    height = im.shape[0] + border[0] * 2  # shape(h,w,c)
-    width = im.shape[1] + border[1] * 2
-
-    # Center
-    C = np.eye(3)
-    C[0, 2] = -im.shape[1] / 2  # x translation (pixels)
-    C[1, 2] = -im.shape[0] / 2  # y translation (pixels)
-
-    # Perspective # 透视变换
-    P = np.eye(3)
-    P[2, 0] = random.uniform(-perspective, perspective)  # x perspective (about y)
-    P[2, 1] = random.uniform(-perspective, perspective)  # y perspective (about x)
-
-    # Rotation and Scale 旋转+缩放
-    R = np.eye(3)
-    a = random.uniform(-degrees, degrees)
-    # a += random.choice([-180, -90, 0, 90])  # add 90deg rotations to small rotations
-    s = random.uniform(1 - scale, 1 + scale)
-    # s = 2 ** random.uniform(-scale, scale)
-    R[:2] = cv2.getRotationMatrix2D(angle=a, center=(0, 0), scale=s)
-
-    # Shear 错切/非垂直投影
-    S = np.eye(3)
-    S[0, 1] = math.tan(random.uniform(-shear, shear) * math.pi / 180)  # x shear (deg)
-    S[1, 0] = math.tan(random.uniform(-shear, shear) * math.pi / 180)  # y shear (deg)
-
-    # Translation 平移
-    T = np.eye(3)
-    T[0, 2] = random.uniform(0.5 - translate, 0.5 + translate) * width  # x translation (pixels)
-    T[1, 2] = random.uniform(0.5 - translate, 0.5 + translate) * height  # y translation (pixels)
-
-    # Combined rotation matrix
-    # 将所有变换矩阵连乘得到最终的变换矩阵
-    M = T @ S @ R @ P @ C  # order of operations (right to left) is IMPORTANT
-    if (border[0] != 0) or (border[1] != 0) or (M != np.eye(3)).any():  # image changed
-        if perspective:
-            im = cv2.warpPerspective(im, M, dsize=(width, height), borderValue=(114, 114, 114))
-        else:  # affine
-            im = cv2.warpAffine(im, M[:2], dsize=(width, height), borderValue=(114, 114, 114))
-
-    # Visualize
-    # import matplotlib.pyplot as plt
-    # ax = plt.subplots(1, 2, figsize=(12, 6))[1].ravel()
-    # ax[0].imshow(im[:, :, ::-1])  # base
-    # ax[1].imshow(im2[:, :, ::-1])  # warped
-
-    # Transform label coordinates
-    # n = len(targets)
-    # if n:
-    #     use_segments = any(x.any() for x in segments)
-    #     new = np.zeros((n, 4))
-    #     if use_segments:  # warp segments
-    #         segments = resample_segments(segments)  # upsample
-    #         # 其中 segment.shape = [n, 2], 表示物体轮廓各个坐标点
-    #         for i, segment in enumerate(segments):
-    #             xy = np.ones((len(segment), 3))
-    #             xy[:, :2] = segment
-    #             xy = xy @ M.T  # transform 应用旋转矩阵
-    #             xy = xy[:, :2] / xy[:, 2:3] if perspective else xy[:, :2]  # perspective rescale or affine
-    #
-    #             # clip
-    #             new[i] = segment2box(xy, width, height)
-    #
-    #     else:  # warp boxes 如果是box坐标, 这里targets每行为[x1,y1,x2,y2],n为行数,表示目标边框个数：
-    #         xy = np.ones((n * 4, 3))
-    #         xy[:, :2] = targets[:, [1, 2, 3, 4, 1, 4, 3, 2]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
-    #         xy = xy @ M.T  # transform 应用旋转矩阵
-    #         # 如果透视变换参数perspective不为0， 就需要做rescale，透视变换参数为0, 则无需做rescale。
-    #         xy = (xy[:, :2] / xy[:, 2:3] if perspective else xy[:, :2]).reshape(n, 8)  # perspective rescale or affine
-    #
-    #         # create new boxes
-    #         x = xy[:, [0, 2, 4, 6]]
-    #         y = xy[:, [1, 3, 5, 7]]
-    #         new = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
-    #
-    #         # clip 将坐标clip到[0, width],[0,height]区间内
-    #         new[:, [0, 2]] = new[:, [0, 2]].clip(0, width)
-    #         new[:, [1, 3]] = new[:, [1, 3]].clip(0, height)
-    #
-    #     # filter candidates 进一步过滤,留下那些w,h>2,宽高比<20,变换后面积比之前比>0.1的那些xy
-    #     i = box_candidates(box1=targets[:, 1:5].T * s, box2=new.T, area_thr=0.01 if use_segments else 0.10)
-    #     targets = targets[i]
-    #     targets[:, 1:5] = new[i]
-
-    return im, targets
+# 高斯模糊
+def gaussian_blur(image):
+    image = cv2.GaussianBlur(image, (5, 5), 3)
+    return image
 
 
-# 图像相互融合
-# 调用函数地址：utils/datasets.py
-def mixup(im, labels, im2, labels2):
-    # Applies MixUp augmentation https://arxiv.org/pdf/1710.09412.pdf
-    r = np.random.beta(32.0, 32.0)  # mixup ratio, alpha=beta=32.0
-    im = (im * r + im2 * (1 - r)).astype(np.uint8)
-    labels = np.concatenate((labels, labels2), 0)
-    return im, labels
+# 空间几何变换
+# 计算所有照片的高宽均值
+def cal_mean():
+    full_fileDir = "./test/"
+    empty_fileDir = "./test/"
+    full_list = os.listdir(full_fileDir)
+    empty_list = os.listdir(empty_fileDir)
+    img_height = []
+    img_width = []
+
+    for full_img in full_list:
+        full_img = cv2.imread((full_fileDir + full_img))
+        h = full_img.shape[0]
+        w = full_img.shape[1]
+
+        img_height.append(h)
+        img_width.append(w)
+
+        for emp_img in empty_list:
+            emp_img = cv2.imread((empty_fileDir + emp_img))
+            h = emp_img.shape[0]
+            w = emp_img.shape[1]
+
+        img_height.append(h)
+        img_width.append(w)
+
+    h_mean = int(np.mean(img_height))
+    w_mean = int(np.mean(img_width))
+    print(h_mean)
+    print(w_mean)
+    return h_mean, w_mean
+
+# 放大缩小
+def Scale(image):
+    h, w = cal_mean()
+    return cv2.resize(image, (w, h), interpolation=cv2.INTER_LINEAR)
 
 
+# 水平翻转
+def Horizontal(image):
+    return cv2.flip(image, 1, dst=None) # 水平镜像
 
-# 垂直翻转
-def Vertical(image):
-    return cv2.flip(image, 0, dst=None)
+
+# 旋转，R可控制图片放大缩小
+def Rotate(image, angle=30, scale=0.9):
+    w = image.shape[1]
+    h = image.shape[0]
+    # rotate matrix
+    M = cv2.getRotationMatrix2D((w/2,h/2), angle, scale)
+    # rotate
+    image = cv2.warpAffine(image,M,(w,h))
+    return image
 
 
-def TestDir():
-    root_path = "data/xxx"
-    save_path = root_path
-    for a, b, c in os.walk(root_path):
-        for file_i in c:
-            file_i_path = os.path.join(a, file_i)
-            print(file_i_path)
-            img_i = cv2.imread(file_i_path)
+# 平移
+def Move(image, x, y):
+    img_info = image.shape
+    height = img_info[0]
+    width = img_info[1]
 
-            img_scale = Scale(img_i, 1.5)
-            cv2.imwrite(os.path.join(save_path, file_i[:-4] + "_scale.jpg"), img_scale)
+    mat_translation = np.float32([[1, 0, x], [0, 1, y]])  # 变换矩阵：设置平移变换所需的计算矩阵：2行3列
+    # [[1,0,20],[0,1,50]]   表示平移变换：其中x表示水平方向上的平移距离，y表示竖直方向上的平移距离。
+    img = cv2.warpAffine(image, mat_translation, (width, height))  # 变换函数
+    return img
 
-            img_noise = Gaussian_noise(img_i)
 
-            img_blur = cv2.GaussianBulr(img_i, (5, 5), 0)
+# Cutout
+def augment_cutout(image):
+    img_tensor = transforms.ToTensor()(image)
+    cut = Cutout(n_holes=1, length=100)  # n_holes=1, length=16
+    img_cutout = cut(img_tensor)
+    img_cutout = img_cutout.mul(255).byte()
+    img_cutout = img_cutout.numpy().transpose((1, 2, 0))
+    return img_cutout
 
+
+def data_aug(img_path, save_path):
+    img_list = os.listdir(img_path)
+    for file_name in img_list:
+        file_i_path = os.path.join(img_path, file_name)
+        print(file_i_path)
+        img_i = cv2.imread(file_i_path)
+
+        print("数据增强开始")
+        img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
+
+        img_dark = Darker(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
+
+        img_bright = Brighter(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
+
+        img_noise = gaussian_noise(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_noise.jpg"),  img_noise)
+
+        img_blur = gaussian_blur(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
+
+        img_scale = Scale(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
+
+        img_horizon = Horizontal(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_horizon.jpg"), img_horizon)
+
+        img_rotate = Rotate(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
+
+        img_move = Move(img_i, x=120, y=120)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
+
+        img_cutout = augment_cutout(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
+
+        print("{}完成".format(file_name))
 
 
 if __name__ == "__main__":
-    TestOneDir()
-    AllDate()
+    img_path = "./test/"
+    save_path = "./aug_img/"
+    data_aug(img_path, save_path)

@@ -7,6 +7,34 @@
 import os, random, shutil
 
 
+def cal_mean(full_fileDir, empty_fileDir):
+    full_list = os.listdir(full_fileDir)
+    empty_list = os.listdir(empty_fileDir)
+    img_height = []
+    img_width = []
+
+    for full_img in full_list:
+        full_img = cv2.imread((full_fileDir + full_img))
+        h = full_img.shape[0]
+        w = full_img.shape[1]
+
+        img_height.append(h)
+        img_width.append(w)
+
+    for emp_img in empty_list:
+        emp_img = cv2.imread((empty_fileDir + emp_img))
+        h = emp_img.shape[0]
+        w = emp_img.shape[1]
+
+        img_height.append(h)
+        img_width.append(w)
+
+    h_mean = np.mean(img_height)
+    w_mean = np.mean(img_width)
+
+    return w_mean, h_mean
+
+
 def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     reful_list = os.listdir(full_valDir)
     reemp_list = os.listdir(empty_valDir)
@@ -49,26 +77,16 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     # return
 
 
-# def move_label(file_list, file_label_train, file_label_val):
-#     for i in file_list:
-#         if i.endswith('.jpg'):
-#             # filename = file_label_train + "\\" + i[:-4] + '.xml'  # 可以改成xml文件将’.txt‘改成'.xml'就可以了
-#             filename = file_label_train + "\\" + i[:-4] + '.txt'  # 可以改成xml文件将’.txt‘改成'.xml'就可以了
-#             if os.path.exists(filename):
-#                 shutil.move(filename, file_label_val)
-#                 print(i + "处理成功！")
-
-
 if __name__ == '__main__':
     # Linux/pycharm控制台相对路径
-    # full_fileDir = './imagenet/images/train/full/'  # full源图片文件夹路径
-    # empty_fileDir = './imagenet/images/train/empty/'  # empty源图片文件夹路径
+    # full_fileDir = './imagenet/images/full/full/'  # full源图片文件夹路径
+    # empty_fileDir = './imagenet/images/full/empty/'  # empty源图片文件夹路径
     # full_valDir = './imagenet/images/val/full/'  # full图片移动到新的文件夹路径
     # empty_valDir = './imagenet/images/val/empty/'  # empty图片移动到新的文件夹路径
 
     # pycharm直接运行的相对路径
-    full_fileDir = '../images/train/full/'  # full源图片文件夹路径
-    empty_fileDir = '../images/train/empty/'  # empty源图片文件夹路径
+    full_fileDir = '../images/full/full/'  # full源图片文件夹路径
+    empty_fileDir = '../images/full/empty/'  # empty源图片文件夹路径
     full_valDir = '../images/val/full/'  # full图片移动到新的文件夹路径
     empty_valDir = '../images/val/empty/'  # empty图片移动到新的文件夹路径
 

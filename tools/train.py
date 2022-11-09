@@ -71,7 +71,7 @@ def main():
     args = parse_args()
 
     logger, final_output_dir, tb_log_dir = create_logger(
-        config, args.cfg, 'train')
+        config, args.cfg, 'full')
 
     logger.info(pprint.pformat(args))
     logger.info(pprint.pformat(config))
@@ -189,7 +189,7 @@ def main():
 
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
         lr_scheduler.step()
-        # train for one epoch
+        # full for one epoch
         train(config, train_loader, model, criterion, optimizer, epoch,
               final_output_dir, tb_log_dir, writer_dict)
         # evaluate on validation set
