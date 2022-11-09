@@ -13,6 +13,9 @@ import os
 # 颜色噪声变化 = HSV + 噪声 + 模糊
 # HSV变换
 # 色域空间增强Augment colorspace：H色调、S饱和度、V亮度
+from imagenet.imageSets.utils.cutout import Cutout
+
+
 def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
     # HSV color-space augmentation
     if hgain or sgain or vgain:
@@ -86,8 +89,8 @@ def gaussian_blur(image):
 # 空间几何变换
 # 计算所有照片的高宽均值
 def cal_mean():
-    full_fileDir = "./test/"
-    empty_fileDir = "./test/"
+    full_fileDir = "imagenet/imageSets/original/full"
+    empty_fileDir = "imagenet/imageSets/original/empty"
     full_list = os.listdir(full_fileDir)
     empty_list = os.listdir(empty_fileDir)
     img_height = []
@@ -114,6 +117,7 @@ def cal_mean():
     print(h_mean)
     print(w_mean)
     return h_mean, w_mean
+
 
 # 放大缩小
 def Scale(image):
