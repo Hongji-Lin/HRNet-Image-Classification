@@ -105,11 +105,10 @@ def main():
                           config.DATASET.TEST_SET)
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-
+    # 修改的地方
     valid_loader = torch.utils.data.DataLoader(
         datasets.ImageFolder(valdir, transforms.Compose([
-            transforms.Resize(int(config.MODEL.IMAGE_SIZE[0] / 0.875)),
-            transforms.CenterCrop(config.MODEL.IMAGE_SIZE[0]),
+            transforms.Resize([224, 224]),
             transforms.ToTensor(),
             normalize,
         ])),
@@ -118,6 +117,20 @@ def main():
         num_workers=config.WORKERS,
         pin_memory=True
     )
+
+    # # 原网络
+    # valid_loader = torch.utils.data.DataLoader(
+    #     datasets.ImageFolder(valdir, transforms.Compose([
+    #         transforms.Resize(int(config.MODEL.IMAGE_SIZE[0] / 0.875)),
+    #         transforms.CenterCrop(config.MODEL.IMAGE_SIZE[0]),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ])),
+    #     batch_size=config.TEST.BATCH_SIZE_PER_GPU*len(gpus),
+    #     shuffle=False,
+    #     num_workers=config.WORKERS,
+    #     pin_memory=True
+    # )
 
     # evaluate on validation set
     validate(config, valid_loader, model, criterion, final_output_dir,

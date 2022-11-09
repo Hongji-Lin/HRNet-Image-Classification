@@ -8,14 +8,12 @@ import cv2
 import numpy as np
 from torchvision.transforms import transforms
 import os
+from imagenet.imageSets.utils.cutout import Cutout
 
 
 # 颜色噪声变化 = HSV + 噪声 + 模糊
 # HSV变换
 # 色域空间增强Augment colorspace：H色调、S饱和度、V亮度
-from imagenet.imageSets.utils.cutout import Cutout
-
-
 def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
     # HSV color-space augmentation
     if hgain or sgain or vgain:
@@ -120,9 +118,9 @@ def gaussian_blur(image):
 
 
 # 放大缩小
-def Scale(image):
+def Scale(img):
     # h, w = cal_mean()
-    return cv2.resize(image, (460, 708), interpolation=cv2.INTER_LINEAR)
+    return cv2.resize(img, (460, 708), interpolation=cv2.INTER_LINEAR)
 
 
 # 水平翻转
@@ -142,14 +140,14 @@ def Rotate(image, angle=30, scale=0.9):
 
 
 # 平移
-def Move(image, x, y):
-    img_info = image.shape
+def Move(img, x, y):
+    img_info = img.shape
     height = img_info[0]
     width = img_info[1]
 
     mat_translation = np.float32([[1, 0, x], [0, 1, y]])  # 变换矩阵：设置平移变换所需的计算矩阵：2行3列
     # [[1,0,20],[0,1,50]]   表示平移变换：其中x表示水平方向上的平移距离，y表示竖直方向上的平移距离。
-    img = cv2.warpAffine(image, mat_translation, (width, height))  # 变换函数
+    img = cv2.warpAffine(img, mat_translation, (width, height))  # 变换函数
     return img
 
 
@@ -217,9 +215,9 @@ if __name__ == "__main__":
     # calmean = cal_mean()
     # print(calmean)
 
-    ful_path = "./original/full/"
-    full_save = "../images/train/full/"
-    data_aug(ful_path, full_save)
+    # ful_path = "./original/full/"
+    # full_save = "../images/train/full/"
+    # data_aug(ful_path, full_save)
 
     emp_path = "./original/empty/"
     emp_save = "../images/train/empty/"

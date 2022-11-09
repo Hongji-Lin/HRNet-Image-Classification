@@ -143,16 +143,26 @@ def main():
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-
+    # 改为不需要数据增强
     train_dataset = datasets.ImageFolder(
         traindir,
         transforms.Compose([
-            transforms.RandomResizedCrop(config.MODEL.IMAGE_SIZE[0]),
-            transforms.RandomHorizontalFlip(),
+            transforms.Resize([224, 224]),
             transforms.ToTensor(),
             normalize,
         ])
     )
+
+    # # 原网络
+    # train_dataset = datasets.ImageFolder(
+    #     traindir,
+    #     transforms.Compose([
+    #         transforms.RandomResizedCrop(config.MODEL.IMAGE_SIZE[0]),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ])
+    # )
 
     # print(train_dataset.classes)  #根据分的文件夹的名字来确定的类别
     with open("class.txt", "w") as f1:
@@ -176,8 +186,7 @@ def main():
 
     valid_loader = torch.utils.data.DataLoader(
         datasets.ImageFolder(valdir, transforms.Compose([
-            transforms.Resize(int(config.MODEL.IMAGE_SIZE[0] / 0.875)),
-            transforms.CenterCrop(config.MODEL.IMAGE_SIZE[0]),
+            transforms.Resize([224, 224]),
             transforms.ToTensor(),
             normalize,
         ])),
