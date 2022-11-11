@@ -1,4 +1,4 @@
-GPUS: (0,1,2,3)
+GPUS: (0) # 原配置文件是4块GPU(0, 1, 2, 3)
 LOG_DIR: 'log/'
 DATA_DIR: ''
 OUTPUT_DIR: 'output/'
@@ -66,7 +66,7 @@ CUDNN:
 DATASET:
   DATASET: 'imagenet'
   DATA_FORMAT: 'jpg'
-  ROOT: 'imagenet/imagenet/'
+  ROOT: 'imagenet/images/'
   TEST_SET: 'val'
   TRAIN_SET: 'full'
 TEST:
