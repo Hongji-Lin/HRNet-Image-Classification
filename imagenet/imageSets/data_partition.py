@@ -65,7 +65,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     full_sample = random.sample(full_list, full_nums)  # 随机选取full数量的样本图片
     empty_sample = random.sample(empty_list, empty_nums)  # 随机选取empty数量的样本图片
 
-    print("按照train:val = 0.9:0.1的比例划分：")
+    print("按照train:val = {}:{}的比例划分：".format(1 - rate, rate))
     print("train集中full的数量为：{}：".format(full_total - full_nums))
     print("train集中empty的数量为：{}".format(empty_total - empty_nums))
     print("val集中full的数量为：{}".format(full_nums))
