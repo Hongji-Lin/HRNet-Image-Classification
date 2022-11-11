@@ -164,7 +164,8 @@ def main():
     #     ])
     # )
 
-    # print(train_dataset.classes)  #根据分的文件夹的名字来确定的类别
+    # print(train_dataset.classes)
+    # 根据分的文件夹的名字来确定的类别
     with open("class.txt", "w") as f1:
         for classname in train_dataset.classes:
             f1.write(classname + '\n')
