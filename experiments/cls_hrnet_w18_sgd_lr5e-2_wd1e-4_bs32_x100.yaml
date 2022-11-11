@@ -68,7 +68,7 @@ DATASET:
   DATA_FORMAT: 'jpg'
   ROOT: 'imagenet/images/'
   TEST_SET: 'val'
-  TRAIN_SET: 'full'
+  TRAIN_SET: 'train'
 TEST:
   BATCH_SIZE_PER_GPU: 32
   MODEL_FILE: ''
