@@ -192,9 +192,9 @@ def data_aug(img_path, save_path):
         img_blur = gaussian_blur(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
 
-        # print("img_scale", end=', ')
-        # img_scale = Scale(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
+        print("img_scale", end=', ')
+        img_scale = Scale(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
 
         print("img_horizon", end=', ')
         img_horizon = Horizontal(img_i)
@@ -219,9 +219,9 @@ if __name__ == "__main__":
     # calmean = cal_mean()
     # print(calmean)
 
-    # ful_path = "./Scale/full/"
-    # full_save = "../images/train/full/"
-    # data_aug(ful_path, full_save)
+    ful_path = "./Scale/full/"
+    full_save = "../images/train/full/"
+    data_aug(ful_path, full_save)
 
     emp_path = "./Scale/empty/"
     emp_save = "../images/train/empty/"
