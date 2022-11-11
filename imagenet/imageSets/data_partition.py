@@ -59,7 +59,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     empty_list = os.listdir(empty_fileDir)  # 取empty图片的原始路径
     empty_total = len(empty_list)
 
-    rate = 0.1  # 自定义抽取图片的比例，比方说100张抽10张，那就是0.1
+    rate = 0.2  # 自定义抽取图片的比例，比方说100张抽10张，那就是0.1
     full_nums = int(full_total * rate)  # 按照rate比例从full文件夹中取一定数量图片
     empty_nums = int(empty_total * rate)  # 按照rate比例从empty文件夹中取一定数量图片
     full_sample = random.sample(full_list, full_nums)  # 随机选取full数量的样本图片
