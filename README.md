@@ -62,7 +62,7 @@ Please specify the configuration file.
 
 For example, train the HRNet-W18 on ImageNet with a batch size of 128 on 4 GPUs:
 ````bash
-python tools/full.py --cfg experiments/cls_hrnet_w18_sgd_lr5e-2_wd1e-4_bs32_x100.yaml
+python tools/train.py --cfg experiments/cls_hrnet_w18_sgd_lr5e-2_wd1e-4_bs32_x100.yaml
 ````
 
 For example, test the HRNet-W18 on ImageNet on 4 GPUs:

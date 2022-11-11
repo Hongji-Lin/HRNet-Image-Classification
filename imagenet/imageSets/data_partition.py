@@ -5,6 +5,8 @@
 # @desc: 数据集的划分
 
 import os, random, shutil
+import cv2
+import numpy as np
 
 
 def cal_mean(full_fileDir, empty_fileDir):
@@ -50,7 +52,7 @@ def move_img(full_fileDir, empty_fileDir, full_valDir, empty_valDir):
     else:
         for name in reemp_list:
             shutil.move(empty_valDir + name, empty_fileDir)
-    return  # 本地调试时要return(清理照片，val保持空的上传），放到服务器上不需要
+    # return  # 本地调试时要return(清理照片，val保持空的上传），放到服务器上不需要
 
     full_list = os.listdir(full_fileDir)  # 取full图片的原始路径
     full_total = len(full_list)

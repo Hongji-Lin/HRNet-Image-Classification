@@ -3,6 +3,7 @@
 # @file: data_augment.py
 # @time: 2022/11/7 14:06
 # @desc: 数据增强
+import copy
 
 import cv2
 import numpy as np
@@ -27,39 +28,42 @@ def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
         lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
 
         im_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
-        cv2.cvtColor(im_hsv, cv2.COLOR_HSV2BGR, dst=im)  # no return needed
+        im_hsv = cv2.cvtColor(im_hsv, cv2.COLOR_HSV2BGR)  # no return needed
     return im_hsv
 
 
 # 变暗
-def Darker(image,percetage=0.5):
-    w = image.shape[1]
-    h = image.shape[0]
+def Darker(image, percetage=0.5):
+    img_out = copy.deepcopy(image)
+    w = img_out.shape[1]
+    h = img_out.shape[0]
     # get darker
     for xi in range(0,w):
         for xj in range(0,h):
-            image[xj,xi,0] = int(image[xj,xi,0]*percetage)
-            image[xj,xi,1] = int(image[xj,xi,1]*percetage)
-            image[xj,xi,2] = int(image[xj,xi,2]*percetage)
-    return image
+            img_out[xj, xi, 0] = int(img_out[xj, xi, 0] * percetage)
+            img_out[xj, xi, 1] = int(img_out[xj, xi, 1] * percetage)
+            img_out[xj, xi, 2] = int(img_out[xj, xi, 2] * percetage)
+    return img_out
 
 
 # 明亮
 def Brighter(image, percetage=1.5):
-    w = image.shape[1]
-    h = image.shape[0]
+    img_out = copy.deepcopy(image)
+    w = img_out.shape[1]
+    h = img_out.shape[0]
     # get brighter
     for xi in range(0,w):
         for xj in range(0,h):
-            image[xj,xi,0] = np.clip(int(image[xj,xi,0]*percetage),a_max=255,a_min=0)
-            image[xj,xi,1] = np.clip(int(image[xj,xi,1]*percetage),a_max=255,a_min=0)
-            image[xj,xi,2] = np.clip(int(image[xj,xi,2]*percetage),a_max=255,a_min=0)
-    return image
+            img_out[xj, xi, 0] = np.clip(int(img_out[xj, xi, 0] * percetage), a_max=255, a_min=0)
+            img_out[xj, xi, 1] = np.clip(int(img_out[xj, xi, 1] * percetage), a_max=255, a_min=0)
+            img_out[xj, xi, 2] = np.clip(int(img_out[xj, xi, 2] * percetage), a_max=255, a_min=0)
+    return img_out
 
 
 # 高斯噪声
 def gaussian_noise(image):
-    h, w, c = image.shape
+    out_img = copy.deepcopy(image)
+    h, w, c = out_img.shape
     for row in range(h):
         for col in range(w):
             # 获取三个高斯随机数
@@ -68,14 +72,14 @@ def gaussian_noise(image):
             # 第三个参数：生成高斯随机数数量
             s = np.random.normal(0,50,3)
             # 获取每个像素点的bgr值
-            b = image[row,col,0]
-            g = image[row,col,1]
-            r = image[row,col,2]
+            b = out_img[row, col, 0]
+            g = out_img[row, col, 1]
+            r = out_img[row, col, 2]
             # 给每个像素值设置新的bgr值
-            image[row,col,0] = np.clip(b+s[0],0,255)
-            image[row,col,1] = np.clip(g+s[1],0,255)
-            image[row,col,2] = np.clip(r+s[2],0,255)
-    return image
+            out_img[row, col, 0] = np.clip(b + s[0], 0, 255)
+            out_img[row, col, 1] = np.clip(g + s[1], 0, 255)
+            out_img[row, col, 2] = np.clip(r + s[2], 0, 255)
+    return out_img
 
 
 # 高斯模糊
@@ -188,9 +192,9 @@ def data_aug(img_path, save_path):
         img_blur = gaussian_blur(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
 
-        print("img_scale", end=', ')
-        img_scale = Scale(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
+        # print("img_scale", end=', ')
+        # img_scale = Scale(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
 
         print("img_horizon", end=', ')
         img_horizon = Horizontal(img_i)
@@ -201,7 +205,7 @@ def data_aug(img_path, save_path):
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
 
         print("img_move", end=', ')
-        img_move = Move(img_i, x=120, y=120)
+        img_move = Move(img_i, x=150, y=150)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
 
         print("img_cutout")
@@ -215,10 +219,11 @@ if __name__ == "__main__":
     # calmean = cal_mean()
     # print(calmean)
 
-    # ful_path = "./original/full/"
+    # ful_path = "./Scale/full/"
     # full_save = "../images/train/full/"
     # data_aug(ful_path, full_save)
 
-    emp_path = "./original/empty/"
+    emp_path = "./Scale/empty/"
     emp_save = "../images/train/empty/"
     data_aug(emp_path, emp_save)
+
