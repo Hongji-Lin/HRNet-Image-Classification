@@ -209,3 +209,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/!
 /imagenet/images/
+*.iml
+.idea/HRNet-Image-Classification.iml
+.idea/misc.xml
