@@ -212,3 +212,6 @@ cython_debug/!
 *.iml
 .idea/HRNet-Image-Classification.iml
 .idea/misc.xml
+/output/
+/log/
+*.pth
