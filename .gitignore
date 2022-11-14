@@ -215,3 +215,4 @@ cython_debug/!
 /output/
 /log/
 *.pth
+*.pth

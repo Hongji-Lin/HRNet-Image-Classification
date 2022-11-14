@@ -8,13 +8,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import time
 import logging
 
 import torch
+import torchvision
 
 from core.evaluate import accuracy
-
+from matplotlib import pyplot as plt
+from torch import device
 
 logger = logging.getLogger(__name__)
 
@@ -27,11 +30,10 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
     top1 = AverageMeter()
     top5 = AverageMeter()
 
-
     # switch to full mode
     model.train()
-
     end = time.time()
+
     for i, (input, target) in enumerate(train_loader):
         # measure imagenet loading time
         data_time.update(time.time() - end)
@@ -78,6 +80,11 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
                 global_steps = writer_dict['train_global_steps']
                 writer.add_scalar('train_loss', losses.val, global_steps)
                 writer.add_scalar('train_top1', top1.val, global_steps)
+
+                images, labels = next(iter(train_loader))
+                img_input = torchvision.utils.make_grid(images)
+                writer.add_image('input_image1', img_input, global_steps)
+
                 writer_dict['train_global_steps'] = global_steps + 1
 
 
@@ -126,6 +133,8 @@ def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
             global_steps = writer_dict['valid_global_steps']
             writer.add_scalar('valid_loss', losses.avg, global_steps)
             writer.add_scalar('valid_top1', top1.avg, global_steps)
+            img_out = torchvision.utils.make_grid(output)
+            writer.add_image('output_image1', img_out, global_steps)
             writer_dict['valid_global_steps'] = global_steps + 1
 
         print('class:{}'.format(output.argmax(1)))
