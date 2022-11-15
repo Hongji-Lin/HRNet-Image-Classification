@@ -19,6 +19,8 @@ from core.evaluate import accuracy
 from matplotlib import pyplot as plt
 from torch import device
 
+from imagenet.imageSets.utils.data_utils import plot_class_preds
+
 logger = logging.getLogger(__name__)
 
 
@@ -84,6 +86,16 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
                 images, labels = next(iter(train_loader))
                 img_input = torchvision.utils.make_grid(images)
                 writer.add_image('input_image1', img_input, global_steps)
+                # add figure into tensorboard
+                fig = plot_class_preds(net=model,
+                                       images_dir="./plot_img",
+                                       # transform=data_transform["val"],
+                                       num_plot=5,
+                                       device=device)
+                if fig is not None:
+                    writer.add_figure("predictions vs. actuals",
+                                      figure=fig,
+                                      global_step=global_steps)
 
                 writer_dict['train_global_steps'] = global_steps + 1
 
