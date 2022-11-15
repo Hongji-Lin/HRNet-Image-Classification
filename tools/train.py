@@ -36,6 +36,10 @@ from utils.utils import get_optimizer
 from utils.utils import save_checkpoint
 from utils.utils import create_logger
 
+from data_utils import read_split_data
+
+from imagenet.imageSets.my_dataset import MyDataSet
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train classification network')
@@ -136,65 +140,46 @@ def main():
             last_epoch-1
         )
 
+    # 划分数据为训练集和验证集
+    data_path = '../imagenet/images/train'
+    train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(data_path)
+
     # Data loading code
-    traindir = os.path.join(config.DATASET.ROOT, config.DATASET.TRAIN_SET)
-    valdir = os.path.join(config.DATASET.ROOT, config.DATASET.TEST_SET)
+    traindir = train_images_path
+    valdir = val_images_path
 
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-    # 改为不需要数据增强
-    train_dataset = datasets.ImageFolder(
-        traindir,
-        transforms.Compose([
-            transforms.Resize([224, 224]),
-            transforms.ToTensor(),
-            normalize,
-        ])
-    )
+    # 定义训练以及预测时的预处理方法
+    data_transform = {
+        "train": transforms.Compose([transforms.RandomResizedCrop(224),
+                                     transforms.ToTensor(),
+                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+        "val": transforms.Compose([transforms.Resize(256),
+                                   transforms.CenterCrop(224),
+                                   transforms.ToTensor(),
+                                   transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
-    # # 原网络
-    # train_dataset = datasets.ImageFolder(
-    #     traindir,
-    #     transforms.Compose([
-    #         transforms.RandomResizedCrop(config.MODEL.IMAGE_SIZE[0]),
-    #         transforms.RandomHorizontalFlip(),
-    #         transforms.ToTensor(),
-    #         normalize,
-    #     ])
-    # )
+    # 实例化训练数据集
+    train_dataset = MyDataSet(images_path=train_images_path,
+                               images_class=train_images_label,
+                               transform=data_transform["train"])
 
-    # print(train_dataset.classes)
-    # 根据分的文件夹的名字来确定的类别
-    with open("class.txt", "w") as f1:
-        for classname in train_dataset.classes:
-            f1.write(classname + '\n')
+    # 实例化验证数据集
+    val_dataset = MyDataSet(images_path=val_images_path,
+                             images_class=val_images_label,
+                             transform=data_transform["val"])
 
-    # print(train_dataset.class_to_idx) #按顺序为这些类别定义索引为0,1...
-    with open("classToIndex.txt", "w") as f2:
-        for key, value in train_dataset.class_to_idx.items():
-            f2.write(str(key) + " " + str(value) + '\n')
+    # 数据加载
+    train_loader = torch.utils.data.DataLoader(train_dataset,
+                                                batch_size=config.TRAIN.BATCH_SIZE_PER_GPU*len(gpus),
+                                                shuffle=True,
+                                                num_workers=config.WORKERS,
+                                                pin_memory=True)
 
-    # print(train_dataset.imgs) #返回从所有文件夹中得到的图片的路径以及其类别
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=config.TRAIN.BATCH_SIZE_PER_GPU*len(gpus),
-        shuffle=True,
-        num_workers=config.WORKERS,
-        pin_memory=True
-    )
-
-    valid_loader = torch.utils.data.DataLoader(
-        datasets.ImageFolder(valdir, transforms.Compose([
-            transforms.Resize([224, 224]),
-            transforms.ToTensor(),
-            normalize,
-        ])),
-        batch_size=config.TEST.BATCH_SIZE_PER_GPU*len(gpus),
-        shuffle=False,
-        num_workers=config.WORKERS,
-        pin_memory=True
-    )
+    valid_loader = torch.utils.data.DataLoader(val_dataset,
+                                                batch_size=config.TEST.BATCH_SIZE_PER_GPU*len(gpus),
+                                                shuffle=False,
+                                                num_workers=config.WORKERS,
+                                                pin_memory=True)
 
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
         lr_scheduler.step()

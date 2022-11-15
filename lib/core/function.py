@@ -14,11 +14,11 @@ import logging
 
 import torch
 import torchvision
-
 from core.evaluate import accuracy
 from torch import device
+from torchvision.transforms import transforms
 
-from data_utils import plot_class_preds
+from utils.data_utils import plot_class_preds
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,17 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
     # switch to full mode
     model.train()
     end = time.time()
+
+    # 定义训练以及预测时的预处理方法
+    data_transform = {
+        "train": transforms.Compose([transforms.RandomResizedCrop(224),
+                                     transforms.RandomHorizontalFlip(),
+                                     transforms.ToTensor(),
+                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+        "val": transforms.Compose([transforms.Resize(256),
+                                   transforms.CenterCrop(224),
+                                   transforms.ToTensor(),
+                                   transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
     for i, (input, target) in enumerate(train_loader):
         # measure imagenet loading time
@@ -89,7 +100,7 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
                 valdir = os.path.join(config.DATASET.ROOT, config.DATASET.TEST_SET)
                 fig = plot_class_preds(net=model,
                                        images_dir=valdir,
-                                       # transform=data_transform["val"],
+                                       transform=data_transform["val"],
                                        num_plot=5,
                                        device=device)
                 if fig is not None:
