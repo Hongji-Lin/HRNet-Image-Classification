@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
+import os
 import time
 import logging
 
@@ -16,10 +16,9 @@ import torch
 import torchvision
 
 from core.evaluate import accuracy
-from matplotlib import pyplot as plt
 from torch import device
 
-from imagenet.imageSets.utils.data_utils import plot_class_preds
+from data_utils import plot_class_preds
 
 logger = logging.getLogger(__name__)
 
@@ -87,8 +86,9 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
                 img_input = torchvision.utils.make_grid(images)
                 writer.add_image('input_image1', img_input, global_steps)
                 # add figure into tensorboard
+                valdir = os.path.join(config.DATASET.ROOT, config.DATASET.TEST_SET)
                 fig = plot_class_preds(net=model,
-                                       images_dir="./plot_img",
+                                       images_dir=valdir,
                                        # transform=data_transform["val"],
                                        num_plot=5,
                                        device=device)

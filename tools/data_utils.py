@@ -112,7 +112,7 @@ def read_pickle(file_name: str) -> list:
 
 def plot_class_preds(net,
                      images_dir: str,
-                     transform,
+                     # transform,
                      num_plot: int = 5,
                      device="cpu"):
     if not os.path.exists(images_dir):
