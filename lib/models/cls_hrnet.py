@@ -322,7 +322,7 @@ class HighResolutionNet(nn.Module):
                                             stride=1)
             incre_modules.append(incre_module)
         incre_modules = nn.ModuleList(incre_modules)
-            
+
         # downsampling modules
         downsamp_modules = []
         for i in range(len(pre_stage_channels)-1):
@@ -485,9 +485,7 @@ class HighResolutionNet(nn.Module):
         else:
             y = F.avg_pool2d(y, kernel_size=y.size()
                                  [2:]).view(y.size(0), -1)
-
         y = self.classifier(y)
-
         return y
 
     def init_weights(self, pretrained='',):

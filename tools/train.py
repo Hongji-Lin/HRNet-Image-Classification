@@ -114,16 +114,15 @@ def main():
     best_model = False
     last_epoch = config.TRAIN.BEGIN_EPOCH
     if config.TRAIN.RESUME:
-        model_state_file = os.path.join(final_output_dir,
-                                        'checkpoint.pth.tar')
+        model_state_file = os.path.join(final_output_dir, 'checkpoint.pth.tar')
+
         if os.path.isfile(model_state_file):
             checkpoint = torch.load(model_state_file)
             last_epoch = checkpoint['epoch']
             best_perf = checkpoint['perf']
             model.module.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
-            logger.info("=> loaded checkpoint (epoch {})"
-                        .format(checkpoint['epoch']))
+            logger.info("=> loaded checkpoint (epoch {})".format(checkpoint['epoch']))
             best_model = True
             
     if isinstance(config.TRAIN.LR_STEP, list):
@@ -221,10 +220,8 @@ def main():
             'optimizer': optimizer.state_dict(),
         }, best_model, final_output_dir, filename='checkpoint.pth.tar')
 
-    final_model_state_file = os.path.join(final_output_dir,
-                                          'final_state.pth.tar')
-    logger.info('saving final model state to {}'.format(
-        final_model_state_file))
+    final_model_state_file = os.path.join(final_output_dir, 'final_state.pth.tar')
+    logger.info('saving final model state to {}'.format(final_model_state_file))
     torch.save(model.module.state_dict(), final_model_state_file)
 
     # 增加保存pth模型的代码
