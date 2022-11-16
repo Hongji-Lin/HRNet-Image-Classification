@@ -35,9 +35,9 @@ from utils.modelsummary import get_model_summary
 from utils.utils import get_optimizer
 from utils.utils import save_checkpoint
 from utils.utils import create_logger
-
+import sys
+sys.path.append('./imagenet/imageSets/utils/data_utils.py')
 from data_utils import read_split_data
-
 from imagenet.imageSets.my_dataset import MyDataSet
 
 
@@ -140,13 +140,9 @@ def main():
             last_epoch-1
         )
 
-    # 划分数据为训练集和验证集
+    # 划分数据为训练集和验证集 Data loading code
     data_path = '../imagenet/images/train'
     train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(data_path)
-
-    # Data loading code
-    traindir = train_images_path
-    valdir = val_images_path
 
     # 定义训练以及预测时的预处理方法
     data_transform = {

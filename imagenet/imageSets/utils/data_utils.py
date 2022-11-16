@@ -128,10 +128,10 @@ def plot_class_preds(net,
     json_label_path = '../class_indices.json'
     assert os.path.exists(json_label_path), "not found {}".format(json_label_path)
     json_file = open(json_label_path, 'r')
-    # {"0": "daisy"}
-    flower_class = json.load(json_file)
-    # {"daisy": "0"}
-    class_indices = dict((v, k) for k, v in flower_class.items())
+    # {"0": "empty"}
+    bin_class = json.load(json_file)
+    # {"empty": "0"}
+    class_indices = dict((v, k) for k, v in bin_class.items())
 
     # reading label.txt file
     label_info = []
@@ -186,7 +186,8 @@ def plot_class_preds(net,
     # width, height
     fig = plt.figure(figsize=(num_imgs * 2.5, 3), dpi=100)
     for i in range(num_imgs):
-        # 1：子图共1行，num_imgs:子图共num_imgs列，当前绘制第i+1个子图
+        # 1：子图共1行，
+        # num_imgs:子图共num_imgs列，当前绘制第i+1个子图
         ax = fig.add_subplot(1, num_imgs, i+1, xticks=[], yticks=[])
 
         # CHW -> HWC
@@ -198,9 +199,9 @@ def plot_class_preds(net,
         plt.imshow(npimg.astype('uint8'))
 
         title = "{}, {:.2f}%\n(label: {})".format(
-            flower_class[str(preds[i])],  # predict class
+            bin_class[str(preds[i])],  # predict class
             probs[i] * 100,  # predict probability
-            flower_class[str(labels[i])]  # true class
+            bin_class[str(labels[i])]  # true class
         )
         ax.set_title(title, color=("green" if preds[i] == labels[i] else "red"))
 
