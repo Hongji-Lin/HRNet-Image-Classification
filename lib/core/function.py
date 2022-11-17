@@ -8,24 +8,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import os
 import time
 import logging
-
 import torch
-import torchvision
 from core.evaluate import accuracy
-from torch import device
-from torchvision.transforms import transforms
-import sys
-sys.path.append('../imagenet/imageSets/utils/data_utils.py')
-from utils.data_utils import plot_class_preds
-from data_utils import read_split_data
-
-from lib import config
 
 logger = logging.getLogger(__name__)
-device = torch.device(list(config.GPUS) if torch.cuda.is_available() else "cpu")
 
 
 def train(config, train_loader, model, criterion, optimizer, epoch,
@@ -86,10 +76,6 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
                 global_steps = writer_dict['train_global_steps']
                 writer.add_scalar('train_loss', losses.val, global_steps)
                 writer.add_scalar('train_top1', top1.val, global_steps)
-                # 显示每个batch的图片
-                images, labels = next(iter(train_loader))
-                img_input = torchvision.utils.make_grid(images)
-                writer.add_image('input_image1', img_input, global_steps)
 
 
 def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
@@ -98,17 +84,6 @@ def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
-
-    # 定义训练以及预测时的预处理方法
-    data_transform = {
-        "train": transforms.Compose([transforms.RandomResizedCrop(224),
-                                     transforms.RandomHorizontalFlip(),
-                                     transforms.ToTensor(),
-                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-        "val": transforms.Compose([transforms.Resize(256),
-                                   transforms.CenterCrop(224),
-                                   transforms.ToTensor(),
-                                   transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
     # switch to evaluate mode
     model.eval()
@@ -147,21 +122,6 @@ def validate(config, val_loader, model, criterion, output_dir, tb_log_dir,
             global_steps = writer_dict['valid_global_steps']
             writer.add_scalar('valid_loss', losses.avg, global_steps)
             writer.add_scalar('valid_top1', top1.avg, global_steps)
-
-            # add figure into tensorboard
-            data_path = '../imagenet/images/train'
-            train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(data_path)
-            valdir = val_images_path
-            fig = plot_class_preds(net=model,
-                                   images_dir=valdir,
-                                   transform=data_transform["val"],
-                                   num_plot=5,
-                                   device=device)
-            if fig is not None:
-                writer.add_figure("predictions vs. actuals",
-                                  figure=fig,
-                                  global_step=global_steps)
-
             writer_dict['train_global_steps'] = global_steps + 1
 
         print('class:{}'.format(output.argmax(1)))
