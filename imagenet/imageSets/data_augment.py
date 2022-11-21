@@ -15,10 +15,11 @@ from imagenet.imageSets.utils.cutout import Cutout
 # 颜色噪声变化 = HSV + 噪声 + 模糊
 # HSV变换
 # 色域空间增强Augment colorspace：H色调、S饱和度、V亮度
-def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
+def augment_hsv(image, hgain=0.5, sgain=0.5, vgain=0.5):
     # HSV color-space augmentation
     if hgain or sgain or vgain:
         r = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain] + 1  # random gains
+        im = copy.deepcopy(image)
         hue, sat, val = cv2.split(cv2.cvtColor(im, cv2.COLOR_BGR2HSV))
         dtype = im.dtype  # uint8
 
@@ -83,7 +84,8 @@ def gaussian_noise(image):
 
 
 # 高斯模糊
-def gaussian_blur(image):
+def gaussian_blur(img):
+    image = copy.deepcopy(img)
     image = cv2.GaussianBlur(image, (5, 5), 5)
     return image
 
@@ -135,7 +137,8 @@ def Horizontal(image):
 
 
 # 旋转，R可控制图片放大缩小
-def Rotate(image, angle=45, scale=0.9):
+def Rotate(img, angle=45, scale=0.9):
+    image = copy.deepcopy(img)
     w = image.shape[1]
     h = image.shape[0]
     # rotate matrix
@@ -158,7 +161,8 @@ def Move(img, x, y):
 
 
 # Cutout
-def augment_cutout(image):
+def augment_cutout(img):
+    image = copy.deepcopy(img)
     img_tensor = transforms.ToTensor()(image)
     cut = Cutout(n_holes=2, length=150)  # n_holes=1, length=16
     img_cutout = cut(img_tensor)
@@ -174,45 +178,45 @@ def data_aug(img_path, save_path):
         img_i = cv2.imread(file_i_path)
 
         print("{}数据增强开始".format(file_name))
-        # print("img_hsv", end=', ')
-        # img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
+        print("img_hsv", end=', ')
+        img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
         #
-        # print("img_dark", end=', ')
-        # img_dark = Darker(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
+        print("img_dark", end=', ')
+        img_dark = Darker(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
         #
-        # print("img_bright", end=', ')
-        # img_bright = Brighter(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
+        print("img_bright", end=', ')
+        img_bright = Brighter(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
         #
         # print("img_noise", end=', ')
         # img_noise = gaussian_noise(img_i)
         # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_noise.jpg"),  img_noise)
         #
-        # print("img_blur", end=', ')
-        # img_blur = gaussian_blur(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
+        print("img_blur", end=', ')
+        img_blur = gaussian_blur(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
         #
-        print("img_scale", end=', ')
-        img_scale = Scale(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
+        # print("img_scale", end=', ')
+        # img_scale = Scale(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
         #
         # print("img_horizon", end=', ')
         # img_horizon = Horizontal(img_i)
         # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_horizon.jpg"), img_horizon)
         #
-        # print("img_rotate", end=', ')
-        # img_rotate = Rotate(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
+        print("img_rotate", end=', ')
+        img_rotate = Rotate(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
         #
         # print("img_move", end=', ')
         # img_move = Move(img_i, x=150, y=150)
         # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
         #
-        # print("img_cutout")
-        # img_cutout = augment_cutout(img_i)
-        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
+        print("img_cutout")
+        img_cutout = augment_cutout(img_i)
+        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
 
         print("{}完成".format(file_name))
 
