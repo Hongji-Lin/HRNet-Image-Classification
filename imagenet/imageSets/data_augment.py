@@ -33,7 +33,7 @@ def augment_hsv(im, hgain=0.5, sgain=0.5, vgain=0.5):
 
 
 # 变暗
-def Darker(image, percetage=0.5):
+def Darker(image, percetage=0.4):
     img_out = copy.deepcopy(image)
     w = img_out.shape[1]
     h = img_out.shape[0]
@@ -47,7 +47,7 @@ def Darker(image, percetage=0.5):
 
 
 # 明亮
-def Brighter(image, percetage=1.5):
+def Brighter(image, percetage=1.65):
     img_out = copy.deepcopy(image)
     w = img_out.shape[1]
     h = img_out.shape[0]
@@ -84,47 +84,49 @@ def gaussian_noise(image):
 
 # 高斯模糊
 def gaussian_blur(image):
-    image = cv2.GaussianBlur(image, (5, 5), 3)
+    image = cv2.GaussianBlur(image, (5, 5), 5)
     return image
 
 
 # 空间几何变换
 # 计算所有照片的高宽均值
-# def cal_mean():
-#     full_fileDir = "./original/full/"
-#     empty_fileDir = "./original/empty/"
-#     full_list = os.listdir(full_fileDir)
-#     empty_list = os.listdir(empty_fileDir)
-#     img_height = []
-#     img_width = []
-#
-#     for full_img in full_list:
-#         full_img = cv2.imread((full_fileDir + full_img))
-#         h = full_img.shape[0]
-#         w = full_img.shape[1]
-#
-#         img_height.append(h)
-#         img_width.append(w)
-#
-#     for emp_img in empty_list:
-#         emp_img = cv2.imread((empty_fileDir + emp_img))
-#         h = emp_img.shape[0]
-#         w = emp_img.shape[1]
-#
-#         img_height.append(h)
-#         img_width.append(w)
-#
-#     h_mean = int(np.mean(img_height))
-#     w_mean = int(np.mean(img_width))
-#     print(h_mean)
-#     print(w_mean)
-#     return h_mean, w_mean
+def cal_mean():
+    full_fileDir = "../images/new/full/"
+    empty_fileDir = "../images/new/empty/"
+    full_list = os.listdir(full_fileDir)
+    empty_list = os.listdir(empty_fileDir)
+    img_height = []
+    img_width = []
+
+    for img_name in full_list:
+        full_path = os.path.join(full_fileDir, img_name)
+        full_img = cv2.imread(full_path)
+        h = full_img.shape[0]
+        w = full_img.shape[1]
+
+        img_height.append(h)
+        img_width.append(w)
+
+    for img_name in empty_list:
+        emp_path = os.path.join(empty_fileDir, img_name)
+        emp_img = cv2.imread(emp_path)
+        try:
+            h = emp_img.shape[0]
+            w = emp_img.shape[1]
+            img_height.append(h)
+            img_width.append(w)
+        except:
+            print(emp_path)
+
+    h_mean = int(np.mean(img_height))
+    w_mean = int(np.mean(img_width))
+    return h_mean, w_mean
 
 
 # 放大缩小
 def Scale(img):
     # h, w = cal_mean()
-    return cv2.resize(img, (460, 708), interpolation=cv2.INTER_LINEAR)
+    return cv2.resize(img, (814, 925), interpolation=cv2.INTER_LINEAR)
 
 
 # 水平翻转
@@ -133,7 +135,7 @@ def Horizontal(image):
 
 
 # 旋转，R可控制图片放大缩小
-def Rotate(image, angle=30, scale=0.9):
+def Rotate(image, angle=45, scale=0.9):
     w = image.shape[1]
     h = image.shape[0]
     # rotate matrix
@@ -158,7 +160,7 @@ def Move(img, x, y):
 # Cutout
 def augment_cutout(image):
     img_tensor = transforms.ToTensor()(image)
-    cut = Cutout(n_holes=1, length=100)  # n_holes=1, length=16
+    cut = Cutout(n_holes=2, length=150)  # n_holes=1, length=16
     img_cutout = cut(img_tensor)
     img_cutout = img_cutout.mul(255).byte()
     img_cutout = img_cutout.numpy().transpose((1, 2, 0))
@@ -172,45 +174,45 @@ def data_aug(img_path, save_path):
         img_i = cv2.imread(file_i_path)
 
         print("{}数据增强开始".format(file_name))
-        print("img_hsv", end=', ')
-        img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
-
-        print("img_dark", end=', ')
-        img_dark = Darker(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
-
-        print("img_bright", end=', ')
-        img_bright = Brighter(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
-
-        print("img_noise", end=', ')
-        img_noise = gaussian_noise(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_noise.jpg"),  img_noise)
-
-        print("img_blur", end=', ')
-        img_blur = gaussian_blur(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
-
+        # print("img_hsv", end=', ')
+        # img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
+        #
+        # print("img_dark", end=', ')
+        # img_dark = Darker(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
+        #
+        # print("img_bright", end=', ')
+        # img_bright = Brighter(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
+        #
+        # print("img_noise", end=', ')
+        # img_noise = gaussian_noise(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_noise.jpg"),  img_noise)
+        #
+        # print("img_blur", end=', ')
+        # img_blur = gaussian_blur(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_blur.jpg"), img_blur)
+        #
         print("img_scale", end=', ')
         img_scale = Scale(img_i)
         cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_scale.jpg"), img_scale)
-
-        print("img_horizon", end=', ')
-        img_horizon = Horizontal(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_horizon.jpg"), img_horizon)
-
-        print("img_rotate", end=', ')
-        img_rotate = Rotate(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
-
-        print("img_move", end=', ')
-        img_move = Move(img_i, x=150, y=150)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
-
-        print("img_cutout")
-        img_cutout = augment_cutout(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
+        #
+        # print("img_horizon", end=', ')
+        # img_horizon = Horizontal(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_horizon.jpg"), img_horizon)
+        #
+        # print("img_rotate", end=', ')
+        # img_rotate = Rotate(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_rotate.jpg"), img_rotate)
+        #
+        # print("img_move", end=', ')
+        # img_move = Move(img_i, x=150, y=150)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_move.jpg"), img_move)
+        #
+        # print("img_cutout")
+        # img_cutout = augment_cutout(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_cutout.jpg"), img_cutout)
 
         print("{}完成".format(file_name))
 
@@ -219,11 +221,11 @@ if __name__ == "__main__":
     # calmean = cal_mean()
     # print(calmean)
 
-    ful_path = "./Scale/full/"
-    full_save = "../images/train/full/"
+    ful_path = "../images/new/full/"
+    full_save = "../images/new/scale/full/"
     data_aug(ful_path, full_save)
 
-    emp_path = "./Scale/empty/"
-    emp_save = "../images/train/empty/"
+    emp_path = "../images/new/empty/"
+    emp_save = "../images/new/scale/empty/"
     data_aug(emp_path, emp_save)
 
