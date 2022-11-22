@@ -209,6 +209,6 @@ def plot_class_preds(net,
 
 
 if __name__ == '__main__':
-    root = '/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/train'
+    root = '/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/full'
     a = read_split_data(root, val_rate = 0.2)
     print(a)

@@ -178,17 +178,17 @@ def data_aug(img_path, save_path):
         img_i = cv2.imread(file_i_path)
 
         print("{}数据增强开始".format(file_name))
-        print("img_hsv", end=', ')
-        img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
-        #
-        print("img_dark", end=', ')
-        img_dark = Darker(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
-        #
-        print("img_bright", end=', ')
-        img_bright = Brighter(img_i)
-        cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
+        # print("img_hsv", end=', ')
+        # img_hsv = augment_hsv(img_i, hgain=0.5, sgain=0.5, vgain=0.5)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_hsv.jpg"),  img_hsv)
+        # #
+        # print("img_dark", end=', ')
+        # img_dark = Darker(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_dark.jpg"), img_dark)
+        # #
+        # print("img_bright", end=', ')
+        # img_bright = Brighter(img_i)
+        # cv2.imwrite(os.path.join(save_path, file_name.split('.')[0] + "_bright.jpg"), img_bright)
         #
         # print("img_noise", end=', ')
         # img_noise = gaussian_noise(img_i)
@@ -225,11 +225,11 @@ if __name__ == "__main__":
     # calmean = cal_mean()
     # print(calmean)
 
-    ful_path = "../images/new/full/"
-    full_save = "../images/new/scale/full/"
-    data_aug(ful_path, full_save)
+    # ful_path = "/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/scale/full"
+    # full_save = "/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/new/full"
+    # data_aug(ful_path, full_save)
 
-    emp_path = "../images/new/empty/"
-    emp_save = "../images/new/scale/empty/"
+    emp_path = "/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/scale/empty"
+    emp_save = "/home/lhj/Documents/GitHub/HRNet-Image-Classification/imagenet/images/new/empty"
     data_aug(emp_path, emp_save)
 
